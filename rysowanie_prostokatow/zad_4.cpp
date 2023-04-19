@@ -64,19 +64,24 @@ class rectWindow : public Graph_lib::Window
             case FL_RELEASE: // zwolnienie lewego przycisku myszy
                 if (drawingNow)
                 {
-                    drawingNow = false;
-                    stop = event_xy();
-                    if (pRect != nullptr)
-                    {
-                        detach(*pRect);
-                        shapes.push_back(pRect);
-                        pRect = nullptr;
-                        redraw();
-                    }
+                    stop_drawing(event_xy());
                 }
                 break;
         }
         return Fl_Window::handle(event);
+    }
+
+    void stop_drawing(Point stop)
+    {
+        drawingNow = false;
+        this->stop = stop;
+        if (pRect != nullptr)
+        {
+            shapes.push_back(pRect);
+            delete pRect;
+            pRect = nullptr;
+            redraw();
+        }
     }
 
     
