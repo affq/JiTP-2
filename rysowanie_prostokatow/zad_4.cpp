@@ -9,14 +9,37 @@ ostream& operator<<(ostream& os, const Point& pt)
     return os << '(' << pt.x << ',' << pt.y << ')';
 }
 
-class DrawingArea : public Shape
+ostream& operator<<(ostream &os, const Rectangle& rect)
+{
+    Point top_left = rect.point(0);
+    int bottom_right_x = top_left.x + rect.width();
+    int bottom_right_y = top_left.y + rect.height();
+    Point bottom_right = Point(bottom_right_x, bottom_right_y);
+    return os << "Rect (" << top_left << bottom_right << ")" << endl; 
+}
+
+class DrawingArea : public Rectangle
 {
     Point tl, br;
 public:
-    DrawingArea (Point tl, Point br) : tl(tl), br(br) {};
+    DrawingArea (Point tl, Point br) : Rectangle(tl, br), tl(tl), br(br) {};
+    
     bool contains (Point point)
     {
-        return point.x >= tl.x && point.x <= br.x && point.y >= tl.y && point.y <= br.y;
+        bool contains_x = point.x >= tl.x && point.x <= br.x;
+        bool contains_y = point.y >= tl.y && point.y <= br.y;
+        return contains_x && contains_y;
+    };
+
+    Point limit (Point point)
+    {
+        int left_limit = max(point.x, tl.x);
+        point.x = min(left_limit, br.x);
+
+        int upper_limit = max(point.y, tl.y);
+        point.y = min(upper_limit, br.y);
+
+        return point;
     }
 };
 
@@ -25,8 +48,8 @@ class rectWindow : public Graph_lib::Window
     Button btn_close, btn_save;
     bool drawingNow = false;
     DrawingArea canvas;
-    Point start, stop;
-    Graph_lib::Rectangle *pRect;
+    Point start;
+    Rectangle *pRect;
     vector<Shape *> shapes;
     
     static void cb_close (Address, Address pWnd)
@@ -39,13 +62,33 @@ class rectWindow : public Graph_lib::Window
         reinterpret_cast<rectWindow *> (pWnd)->save();
     };
 
+    Point event_xy() const
+    {
+        return Point(Fl::event_x(), Fl::event_y());
+    };
+
+public:
+    rectWindow (Point loc, int w, int h, const string& title):
+    Window(loc, w, h, title),
+    btn_close(Point(x_max() - 80, y_max() - 20), 80, 20,
+        "Close", rectWindow::cb_close),
+    btn_save(Point(x_max() - 80, y_max() - 50), 80, 20,
+        "Save", rectWindow::cb_save),
+    drawingNow(false),
+    canvas(Point(10,10), Point(x_max()-100, y_max()-10)),
+    start(0, 0), pRect(nullptr)
+        {
+            attach(btn_close);
+            attach(btn_save);
+        };
+
     void start_drawing(Point start)
     {
         this->start = start;
         drawingNow = true;
-    }
+    };
 
-        int handle (int event)
+    int handle (int event)
     {
         switch (event)
         {
@@ -64,83 +107,55 @@ class rectWindow : public Graph_lib::Window
             case FL_RELEASE: // zwolnienie lewego przycisku myszy
                 if (drawingNow)
                 {
-                    stop_drawing(event_xy());
+                    stop_drawing();
                 }
                 break;
         }
         return Fl_Window::handle(event);
     }
 
-    void stop_drawing(Point stop)
-    {
-        drawingNow = false;
-        this->stop = stop;
-        if (pRect != nullptr)
-        {
-            shapes.push_back(pRect);
-            delete pRect;
-            pRect = nullptr;
-            redraw();
-        }
-    }
-
-    
-    void save()
-    {
-        ofstream ofs("rects.txt");
-        for (auto p : shapes)
-        {
-            ofs << p->point(0).x << ' ' << p->point(0).y << ' '
-                << p->point(1).x << ' ' << p->point(1).y << endl;
-        }
-    }
-
-    Point event_xy() const
-    {
-        return Point(Fl::event_x(), Fl::event_y());
-    }
-
-public:
-    rectWindow (Point loc, int w, int h, const string& title)
-    : Window(loc, w, h, title),
-    btn_close(Point(x_max() - 80, y_max() - 20), 80, 20,
-        "Close", rectWindow::cb_close),
-    btn_save(Point(x_max() - 80, y_max() - 50), 80, 20,
-        "Save", rectWindow::cb_save),
-    drawingNow(false),
-    canvas(Point(10,10), Point(x_max()-100, y_max()-10)),
-    start(0, 0), stop(0, 0), pRect(nullptr)
-        {
-            attach(btn_close);
-            attach(btn_save);
-        };
-
     void draw(Point stop)
     {
-        this->stop = stop;
-
-        if (start.x == stop.x || start.y == stop.y)
-            return;
+        if (start.x == stop.x || start.y == stop.y) return;
+        
+        stop = canvas.limit(stop);
         
         if (pRect)
         {
-            cout << "detach" << endl;
             detach(*pRect);
+            delete pRect;
         }
 
         Point top_left = Point(min(start.x, stop.x), min(start.y, stop.y));
         Point bottom_right = Point(max(start.x, stop.x), max(start.y, stop.y));
-        cout << "top_left: " << top_left << ", bottom_right: " << bottom_right << endl;
-
-        pRect = new Graph_lib::Rectangle(top_left, bottom_right);
+        pRect = new Rectangle(top_left, bottom_right);
         attach(*pRect);
         redraw();
-        return;
     }
 
-};
+    void stop_drawing()
+    {
+        drawingNow = false;
+        shapes.push_back(pRect);
+        pRect = nullptr;
+        delete pRect;
+        redraw();
+    }
 
-void cb_quit (Address, Address pw) { reinterpret_cast<rectWindow *>(pw)->hide(); }
+    void save()
+    {
+        ofstream o("rect.txt");
+        for (auto shape : shapes)
+        {
+             if (auto rect = dynamic_cast<Rectangle *>(shape))
+             {
+                 o << *rect;
+             }
+             else 
+                throw runtime_error("unknown shape");
+        }
+    }
+};
 
 int main()
 {
