@@ -9,7 +9,7 @@ ostream& operator<<(ostream& os, const Point& pt)
     return os << '(' << pt.x << ',' << pt.y << ')';
 }
 
-ostream& operator<<(ostream &os, const Rectangle& rect)
+ostream& operator<<(ostream &os, const Graph_lib::Rectangle& rect)
 {
     Point top_left = rect.point(0);
     int bottom_right_x = top_left.x + rect.width();
@@ -18,12 +18,11 @@ ostream& operator<<(ostream &os, const Rectangle& rect)
     return os << "Rect (" << top_left << bottom_right << ")" << endl; 
 }
 
-class DrawingArea : public Rectangle
+class DrawingArea : public Graph_lib::Rectangle
 {
     Point tl, br;
 public:
-    DrawingArea (Point tl, Point br) : Rectangle(tl, br), tl(tl), br(br) {};
-    
+    DrawingArea (Point tl, Point br) : Graph_lib::Rectangle(tl, br), tl(tl), br(br) {};
     bool contains (Point point)
     {
         bool contains_x = point.x >= tl.x && point.x <= br.x;
@@ -49,7 +48,7 @@ class rectWindow : public Graph_lib::Window
     bool drawingNow = false;
     DrawingArea canvas;
     Point start;
-    Rectangle *pRect;
+    Graph_lib::Rectangle *pRect;
     vector<Shape *> shapes;
     
     static void cb_close (Address, Address pWnd)
@@ -69,7 +68,7 @@ class rectWindow : public Graph_lib::Window
 
 public:
     rectWindow (Point loc, int w, int h, const string& title):
-    Window(loc, w, h, title),
+    Graph_lib::Window(loc, w, h, title),
     btn_close(Point(x_max() - 80, y_max() - 20), 80, 20,
         "Close", rectWindow::cb_close),
     btn_save(Point(x_max() - 80, y_max() - 50), 80, 20,
@@ -128,7 +127,7 @@ public:
 
         Point top_left = Point(min(start.x, stop.x), min(start.y, stop.y));
         Point bottom_right = Point(max(start.x, stop.x), max(start.y, stop.y));
-        pRect = new Rectangle(top_left, bottom_right);
+        pRect = new Graph_lib::Rectangle(top_left, bottom_right);
         attach(*pRect);
         redraw();
     }
@@ -147,7 +146,7 @@ public:
         ofstream o("rect.txt");
         for (auto shape : shapes)
         {
-             if (auto rect = dynamic_cast<Rectangle *>(shape))
+             if (auto rect = dynamic_cast<Graph_lib::Rectangle *>(shape))
              {
                  o << *rect;
              }
