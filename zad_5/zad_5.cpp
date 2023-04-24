@@ -121,6 +121,99 @@ int main()
             cerr << res << '\n';
         }
     }
-    
+
+    //testy set identity
+    {
+        Matrix <float> mx;
+        cout << mx << endl;
+    }
+
+    //testy max
+    {
+        FPoint p1 (2.0f, 3.5f);
+        FPoint p2 (6.1f, 0.7f);
+
+        FPoint res = max(p1, p2);
+
+        if (res.x != 6.1f || res.y != 3.5f)
+        {
+            cerr << "Bad values after max: \n";
+            cerr << res << '\n';
+        }
+    }
+
+    //testy  Matrix(const Matrix& rhm) 
+    {
+        Matrix <float> mx;
+        mx(1,2) = 3.4f;
+        Matrix <float> mx2(mx);
+        cout << mx2 << endl;
+    } 
+
+    //testy Matrix& operator = (const Matrix& rhm)
+    {
+        Matrix <float> mx;
+        mx(1,1) = 4.4f;
+        Matrix <float> mx2;
+        mx2 = mx;
+        cout << mx2 << endl;
+    }
+
+    //testy static Matrix scaleMx(T scaleX, T scaleY)
+    {
+        Matrix <float> mx = Matrix<float>::scaleMx(2.0f, 3.0f);
+        cout << mx << endl;
+    }
+
+    //testy static Matrix translateMx(T offsetX, T offsetY)
+    {
+        Matrix <float> mx = Matrix<float>::translateMx(2.0f, 3.0f);
+        cout << mx << endl;
+    }
+
+    //testy static Matrix rotateMx(T angle)
+    {
+        Matrix <float> mx = Matrix<float>::rotateMx(90.0f);
+        cout << mx << endl;
+    }
+
+    //testy friend Matrix operator * (const Matrix& lhm, const Matrix& rhm)
+    {
+        Matrix <float> mx;
+        mx(0,0) = 2.0f;
+        mx(1,1) = 4.5f;
+        cout << mx << endl;
+        Matrix <float> mx2;
+        mx2(0,2) = 3.2f;
+        mx2(0,0) = 1.1f;
+        mx2(1,1) = 4.5f;
+        mx2(2,2) = 3.4f;
+        cout << mx2 << endl;
+        Matrix <float> mx3 = mx * mx2;
+        cout << mx3 << endl;
+    }
+
+    //testy Matrix& operator *= (const Matrix& rhm)
+    {
+        Matrix <float> mx;
+        mx(0,0) = 2.0f;
+        mx(1,1) = 4.5f;
+        Matrix <float> mx2;
+        mx2(0,2) = 3.2f;
+        mx2(0,0) = 1.1f;
+        mx2(1,1) = 4.5f;
+        mx2(2,2) = 3.4f;
+        mx*=mx2;
+        cout << mx;
+    }
+
+    //testy FPoint transform(const FPoint& pt) const
+    {
+        FPoint pt(1,4);
+        Matrix <float> mx;
+        mx(1,2) = 3;
+        FPoint xd = mx.transform(pt);
+        cout << xd;
+    }
     return 0;
 }
