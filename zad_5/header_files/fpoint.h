@@ -7,11 +7,14 @@ class FPoint
 public:
     float x,y;
     FPoint(float cx=0.0f, float cy=0.0f) : x(cx), y(cy) {}
-    friend std::ostream& operator <<(std::ostream& os, FPoint& p)
+    friend std::ostream& operator <<(std::ostream& os, const FPoint& p)
     {
         return os << '(' << p.x << ',' << p.y << ')';
     };
-    friend std::istream& operator >>(std::ostream& is, const FPoint& p);
+    friend std::istream& operator >>(std::istream& is, FPoint& p)
+    {
+        return is >> p.x >> p.y;
+    }
     operator Graph_lib::Point() const
     {
         return Graph_lib::Point((int)x, (int)y);
