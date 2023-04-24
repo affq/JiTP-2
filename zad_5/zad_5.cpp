@@ -51,6 +51,76 @@ int main()
         Matrix<double> dmx;
         cout << "Matrix<double> " << dmx << '\n';
     }
+
+    // testy dodawania
+    {
+        FPoint pt(1.0f, 0.003f);
+        float val = 0.3f;
+
+        FPoint res = pt + val;
+
+        if (!approx_equal(res.x, 1.3f) || !approx_equal(res.y, 0.303f))
+        {
+            cerr << "Bad values after addition: \n";
+            cerr << res << '\n';
+        }
+    }
+
+    //testy odejmowania
+    {
+        FPoint pt(2.56f, 3.78f);
+        float val = 0.76f;
+
+        FPoint res = pt - val;
+
+        if (!approx_equal(res.x, 1.8f) || !approx_equal(res.y, 3.02f))
+        {
+            cerr << "Bad values after subtraction: \n";
+            cerr << res << '\n';
+        }
+    }
+
+    //testy dodawania dwoch punktow
+    {
+        FPoint p1 (1.0f, 0.053f);
+        FPoint p2 (0.006f, 0.37f);
+
+        FPoint res = p1 + p2;
+
+        if (!approx_equal(res.x, 1.006f) || !approx_equal(res.y, 0.423f))
+        {
+            cerr << "Bad values after addition of two points: \n";
+            cerr << res << '\n';
+        }
+    }
+
+    // testy dystansu
+    {
+        FPoint p1 (.0f, .0f);
+        FPoint p2 (1.0f, 1.0f);
+
+        float res = distance(p1, p2);
+
+        if (!approx_equal(res, sqrt(2)))
+        {
+            cerr << "Bad values after distance: \n";
+            cerr << res << '\n';
+        }
+    }
+
+    //testy min
+    {
+        FPoint p1 (2.0f, 3.5f);
+        FPoint p2 (6.1f, 0.7f);
+
+        FPoint res = min(p1, p2);
+
+        if (res.x != 2.0f || res.y != 0.7f)
+        {
+            cerr << "Bad values after min: \n";
+            cerr << res << '\n';
+        }
+    }
     
     return 0;
 }
