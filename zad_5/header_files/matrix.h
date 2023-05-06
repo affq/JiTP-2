@@ -12,7 +12,10 @@ template <typename T> class Matrix
     {
         for (int i = 0; i < size; ++i)
             for (int j = 0; j < size; ++j)
-                cf[i][j] = (i == j) ? 1 : 0;
+                if (i == j)
+                    cf[i][j] = 1;
+                else
+                    cf[i][j] = 0;
     }
 
     void copyMx(const Matrix& rhm)
@@ -42,22 +45,23 @@ public:
     static Matrix scaleMx(T scaleX, T scaleY)
     {
         Matrix mx;
-        mx(0, 0) = scaleX;
-        mx(1, 1) = scaleY;
+        mx(0,0) = scaleX;
+        mx(1,1) = scaleY;
         return mx;
     }
 
     static Matrix translateMx(T offsetX, T offsetY)
     {
         Matrix mx;
-        mx(0, 2) = offsetX;
-        mx(1, 2) = offsetY;
+        mx(0,2) = offsetX;
+        mx(1,2) = offsetY;
         return mx;
     }
 
     static Matrix rotateMx(T angle)
     {
         Matrix mx;
+        angle = angle * M_PI / 180.0f;
         mx(0, 0) = cos(angle);
         mx(0, 1) = -sin(angle);
         mx(1, 0) = sin(angle);
@@ -68,13 +72,17 @@ public:
     friend Matrix operator * (const Matrix& lhm, const Matrix& rhm)
     {
         Matrix res;
-        res(0,0) = 0;
-        res(1,1) = 0;
-        res(2,2) = 0;
+        
+        //zerowanie macierzy wynikowej
+        for (int i = 0; i < size; ++i)
+            for (int j = 0; j < size; ++j) 
+                res(i, j) = 0;
+
         for (int i = 0; i < size; ++i)
             for (int j = 0; j < size; ++j)
                 for (int k = 0; k < size; ++k)
                     res(i, j) += lhm(i, k) * rhm(k, j);
+
         return res;
     }
 
