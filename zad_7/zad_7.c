@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
 
     // here some image processing has to be implemented
 
+    //sepia filter application
+    ptrImage = sepia(ptrImage);
+
     if (saveBmp(argv[2], ptrImage) != 0)
     {
         printf("Error writing output bitmap.\n");

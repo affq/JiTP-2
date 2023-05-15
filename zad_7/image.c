@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 ImageInfo* readBmp(const char* fileName)
 {
     FILE* file = fopen(fileName,"rb");
@@ -49,7 +48,7 @@ ImageInfo* readBmp(const char* fileName)
         return NULL;
     }
     imginfo->pImg = (unsigned char*) malloc(imgsize);
-    if(imginfo->pImg == 0)
+    if(imginfo->pImg == NULL)
     {
         fclose(file);
         freeImage(imginfo);
@@ -117,3 +116,32 @@ void freeImage(ImageInfo *imageinfo)
         free(imageinfo);
     }
 }
+
+unsigned int min(unsigned int a, unsigned int b)
+{
+    return a < b ? a : b;
+};
+
+//sepia filter
+ImageInfo* sepia(ImageInfo *image)
+{
+    unsigned image_size = image->height * image->line_bytes;
+
+    for (unsigned int i = 0; i < image_size; i+=3)
+    {
+        unsigned char blue = image->pImg[i];
+        unsigned char green = image->pImg[i+1];
+        unsigned char red = image->pImg[i+2];
+
+        unsigned int new_blue = min(255, (red * 0.272 + green * 0.534 + blue * 0.131 ));
+        unsigned int new_green = min(255, (red * 0.349 + green * 0.686 + blue * 0.168 ));
+        unsigned int new_red = min(255, (red * 0.393 + green * 0.769 + blue * 0.189));
+
+        image->pImg[i] = new_blue;
+        image->pImg[i+1] = new_green;
+        image->pImg[i+2] = new_red;
+    }
+    return image;
+}
+
+
