@@ -39,7 +39,8 @@ void freeImage(ImageInfo *imageinfo);
 ImageInfo* readBmp(const char* fileName);
 int saveBmp(const char* fileName, ImageInfo *imageinfo);
 
-// new function
+// new functions
 ImageInfo* sepia(ImageInfo *imageinfo);
+unsigned int min(unsigned int a, unsigned int b);
 
 #endif // __IMAGE_H_INCLUDE__

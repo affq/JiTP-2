@@ -120,28 +120,29 @@ void freeImage(ImageInfo *imageinfo)
 unsigned int min(unsigned int a, unsigned int b)
 {
     return a < b ? a : b;
-};
-
-//sepia filter
-ImageInfo* sepia(ImageInfo *image)
-{
-    unsigned image_size = image->height * image->line_bytes;
-
-    for (unsigned int i = 0; i < image_size; i+=3)
-    {
-        unsigned char blue = image->pImg[i];
-        unsigned char green = image->pImg[i+1];
-        unsigned char red = image->pImg[i+2];
-
-        unsigned int new_blue = min(255, (red * 0.272 + green * 0.534 + blue * 0.131 ));
-        unsigned int new_green = min(255, (red * 0.349 + green * 0.686 + blue * 0.168 ));
-        unsigned int new_red = min(255, (red * 0.393 + green * 0.769 + blue * 0.189));
-
-        image->pImg[i] = new_blue;
-        image->pImg[i+1] = new_green;
-        image->pImg[i+2] = new_red;
-    }
-    return image;
 }
 
+ImageInfo* sepia(ImageInfo *imageinfo)
+{
+    unsigned char* pImg = imageinfo->pImg;
+    unsigned int linebytes = imageinfo->line_bytes;
 
+    for (unsigned int i = 0; i < imageinfo->height; ++i)
+    {
+        for (unsigned int j = 0; j < imageinfo->width; ++j)
+        {
+            unsigned char blue = pImg[i * linebytes + j * 3];
+            unsigned char green = pImg[i * linebytes + j * 3 + 1];
+            unsigned char red = pImg[i * linebytes + j * 3 + 2];
+
+            unsigned int newR = min(255, (0.393 * red + 0.769 * green + 0.189 * blue));
+            unsigned int newG = min(255, (0.349 * red + 0.686 * green + 0.168 * blue));
+            unsigned int newB = min(255, (0.272 * red + 0.534 * green + 0.131 * blue));
+
+            imageinfo->pImg[i * linebytes + j * 3] = newB;
+            imageinfo->pImg[i * linebytes + j * 3 + 1] = newG;
+            imageinfo->pImg[i * linebytes + j * 3 + 2] = newR;
+        }
+    }
+    return imageinfo;
+}
