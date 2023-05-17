@@ -44,15 +44,25 @@ void MenuHeader::attach(MenuWindow* pWnd, const std::vector<colorSpec>& btns)
         pWindow->attach(*buttons.back());
     }
     hideMenu();
-    pw->callback(reinterpret_cast<Fl_Callback*>(cb_openclose), this);
-    cout << "Menu button address:" << this << '\n';
+
+    mAction.pParent = pWnd;
+    mAction.pMenu = this;
+    pw->callback(reinterpret_cast<Fl_Callback*>(cb_openclose), &mAction);
 }
 
-void MenuHeader::cb_openclose (Graph_lib::Address, Graph_lib::Address pMenu)
+void MenuHeader::cb_openclose (Graph_lib::Address, Graph_lib::Address pDsc)
 {
-    cout << "menu header pressed with pMenu == "<< pMenu << '\n';
-    MenuHeader *pHeader = reinterpret_cast<MenuHeader *> (pMenu);
-    pHeader->is_open ? pHeader->hideMenu() : pHeader->showMenu();
+    // cout << "menu header pressed with pMenu == "<< pMenu << '\n';
+    // MenuHeader *pHeader = reinterpret_cast<MenuHeader *> (pMenu);
+    // pHeader->is_open ? pHeader->hideMenu() : pHeader->showMenu();
+
+    actionDescriptor *pAD = reinterpret_cast<actionDescriptor*>(pDsc);
+    if (pAD->pMenu->is_open)
+        pAD->menu_action = actionDescriptor::Menu_close;
+    else
+        pAD->menu_action = actionDescriptor::Menu_open;
+    
+    pAD->pParent->menuAction(pAD);
 };
 
 std::vector<colorSpec> MenuWindow::fill_colors{
@@ -83,3 +93,41 @@ void MenuWindow::cb_close (Graph_lib::Address, Graph_lib::Address pWnd)
 {
     reinterpret_cast<MenuWindow *> (pWnd)->hide();
 };
+
+void MenuWindow::menuAction(actionDescriptor* pAD)
+{
+    switch (pAD->menu_action)
+    {
+    case actionDescriptor::Menu_open:
+        pAD->pMenu->showMenu();
+        //detach a rectangle from the window
+        pAD->pParent->detach(pAD->pParent->rect);
+        //redraw the window
+        pAD->pParent->redraw();
+        break;
+    case actionDescriptor::Menu_close:
+        pAD->pMenu->hideMenu();
+        //attach a rectangle to the window
+        pAD->pParent->attach(pAD->pParent->rect);
+        //redraw the window
+        pAD->pParent->redraw();
+        break;
+    case actionDescriptor::Menu_select:
+        pAD->pParent->rect.set_fill_color(pAD->selected_color);
+        pAD->pParent->redraw();
+        break;
+    default:
+        break;
+    }
+};
+
+void MenuItem::attach(MenuWindow* pWnd, MenuHeader *pMenu, Graph_lib::Color color, Graph_lib::Callback cb_setColor)
+{
+    buttonAction.pParent = pWnd;
+    buttonAction.pMenu = pMenu;
+    buttonAction.menu_action = actionDescriptor::Menu_select;
+    buttonAction.selected_color = color;
+
+    pWnd->attach(*this);
+    pw->callback(reinterpret_cast<Fl_Callback*>(cb_setColor), &buttonAction);
+}
