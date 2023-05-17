@@ -94,6 +94,24 @@ std::vector<colorSpec> MenuWindow::fill_colors{
     { "Black", Graph_lib::Color::black }
 };
 
+std::vector<colorSpec> MenuWindow::frame_colors
+{
+    { "No frame", Graph_lib::Color::invisible },
+    { "Red", Graph_lib::Color::red },
+    { "Green", Graph_lib::Color::green },
+    { "Blue", Graph_lib::Color::blue },
+    { "Yellow", Graph_lib::Color::yellow },
+    { "Magenta", Graph_lib::Color::magenta },
+    { "Cyan", Graph_lib::Color::cyan },
+    { "Dark red", Graph_lib::Color::dark_red },
+    { "Dark green", Graph_lib::Color::dark_green },
+    { "Dark blue", Graph_lib::Color::dark_blue },
+    { "Dark yellow", Graph_lib::Color::dark_yellow },
+    { "Dark magenta", Graph_lib::Color::dark_magenta },
+    { "Dark cyan", Graph_lib::Color::dark_cyan },
+    { "White", Graph_lib::Color::white },
+    { "Black", Graph_lib::Color::black }
+};
 
 MenuWindow::MenuWindow(Graph_lib::Point loc, int width, int height, const string& title)
     : Graph_lib::Window(loc, width, height, title),
@@ -105,7 +123,7 @@ MenuWindow::MenuWindow(Graph_lib::Point loc, int width, int height, const string
     attach(btn_close);
     attach(rect);
     menu_fill.attach(this, fill_colors);
-    menu_frame.attach(this, fill_colors);
+    menu_frame.attach(this, frame_colors);
 };
 
 MenuWindow::~MenuWindow()
@@ -120,7 +138,12 @@ void MenuWindow::cb_close (Graph_lib::Address, Graph_lib::Address pWnd)
 
 void MenuWindow::menuAction(actionDescriptor* pAD)
 {
-    switch (pAD->menu_action)
+    if (pAD->pMenu == &menu_fill && menu_frame.isOpen())
+        menu_frame.hideMenu();
+    else if (pAD->pMenu == &menu_frame && menu_fill.isOpen())
+        menu_fill.hideMenu();
+        
+switch (pAD->menu_action)
     {
     case actionDescriptor::Menu_open:
         pAD->pMenu->showMenu();
@@ -138,7 +161,10 @@ void MenuWindow::menuAction(actionDescriptor* pAD)
         break;
     case actionDescriptor::Menu_select:
         pAD->pMenu->hideMenu();
-        pAD->pParent->rect.set_fill_color(pAD->selected_color);
+        if (pAD->pMenu == &menu_fill)
+            pAD->pParent->rect.set_fill_color(pAD->selected_color);
+        else if (pAD->pMenu == &menu_frame)
+            pAD->pParent->rect.set_color(pAD->selected_color);
         //attach a rectangle to the window
         pAD->pParent->attach(pAD->pParent->rect);
         pAD->pParent->redraw();

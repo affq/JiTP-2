@@ -46,6 +46,8 @@ public:
     void showMenu();
     void hideMenu();
 
+    bool isOpen() { return is_open; };
+
     void attach(MenuWindow* pWnd, const std::vector<colorSpec>& btns);
 };
 
@@ -58,6 +60,7 @@ class MenuWindow : public Graph_lib::Window
 
     static void cb_close (Graph_lib::Address, Graph_lib::Address pWnd);
     static std::vector<colorSpec> fill_colors;
+    static std::vector<colorSpec> frame_colors;
 public:
     MenuWindow(Graph_lib::Point loc, int width, int height, const string& title);
     ~MenuWindow();
