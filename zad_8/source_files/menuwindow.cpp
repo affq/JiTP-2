@@ -2,6 +2,13 @@
 
 using namespace std;
 
+MenuItem::MenuItem(Graph_lib::Point loc, int width, int height, const string& label)
+    : Graph_lib::Button(loc, width, height, label, nullptr)
+{
+
+}
+
+
 MenuHeader::MenuHeader(Graph_lib::Point loc, int width, int height, const string& label)
     : Graph_lib::Button(loc, width, height, label, cb_openclose)
 {
@@ -40,22 +47,19 @@ void MenuHeader::attach(MenuWindow* pWnd, const std::vector<colorSpec>& btns)
     for (size_t idx = 0; idx < btns.size(); ++idx)
     {
         xy.y += 20;
-        buttons.push_back(new Graph_lib::Button(xy, 80, 20, btns[idx].label, nullptr));
-        pWindow->attach(*buttons.back());
+        buttons.push_back (new MenuItem(xy, 80, 20, btns[idx].label));
+        buttons.back()->attach(pWnd, this, btns[idx].color, cb_setColor);
     }
+
     hideMenu();
 
     mAction.pParent = pWnd;
     mAction.pMenu = this;
     pw->callback(reinterpret_cast<Fl_Callback*>(cb_openclose), &mAction);
-}
+};
 
 void MenuHeader::cb_openclose (Graph_lib::Address, Graph_lib::Address pDsc)
 {
-    // cout << "menu header pressed with pMenu == "<< pMenu << '\n';
-    // MenuHeader *pHeader = reinterpret_cast<MenuHeader *> (pMenu);
-    // pHeader->is_open ? pHeader->hideMenu() : pHeader->showMenu();
-
     actionDescriptor *pAD = reinterpret_cast<actionDescriptor*>(pDsc);
     if (pAD->pMenu->is_open)
         pAD->menu_action = actionDescriptor::Menu_close;
@@ -65,11 +69,29 @@ void MenuHeader::cb_openclose (Graph_lib::Address, Graph_lib::Address pDsc)
     pAD->pParent->menuAction(pAD);
 };
 
+void MenuHeader::cb_setColor (Graph_lib::Address, Graph_lib::Address pAD)
+{
+    actionDescriptor *pDsc = reinterpret_cast<actionDescriptor*>(pAD);
+    pDsc->menu_action = actionDescriptor::Menu_select;
+    pDsc->pParent->menuAction(pDsc);
+};
+
 std::vector<colorSpec> MenuWindow::fill_colors{
     { "No fill", Graph_lib::Color::invisible },
     { "Red", Graph_lib::Color::red },
     { "Green", Graph_lib::Color::green },
     { "Blue", Graph_lib::Color::blue },
+    { "Yellow", Graph_lib::Color::yellow },
+    { "Magenta", Graph_lib::Color::magenta },
+    { "Cyan", Graph_lib::Color::cyan },
+    { "Dark red", Graph_lib::Color::dark_red },
+    { "Dark green", Graph_lib::Color::dark_green },
+    { "Dark blue", Graph_lib::Color::dark_blue },
+    { "Dark yellow", Graph_lib::Color::dark_yellow },
+    { "Dark magenta", Graph_lib::Color::dark_magenta },
+    { "Dark cyan", Graph_lib::Color::dark_cyan },
+    { "White", Graph_lib::Color::white },
+    { "Black", Graph_lib::Color::black }
 };
 
 
@@ -77,11 +99,13 @@ MenuWindow::MenuWindow(Graph_lib::Point loc, int width, int height, const string
     : Graph_lib::Window(loc, width, height, title),
     btn_close(Graph_lib::Point(x_max() - 80, y_max() - 20), 80, 20, "Close", cb_close),
     rect(Graph_lib::Point(100, 100), width - 200, height - 200),
-    menu_fill(Graph_lib::Point(50,50), 80, 20, "Fill")
+    menu_fill(Graph_lib::Point(50, 50), 80, 20, "Fill"),
+    menu_frame(Graph_lib::Point(x_max() - 130, 50), 80, 20, "Frame")
 {
     attach(btn_close);
     attach(rect);
     menu_fill.attach(this, fill_colors);
+    menu_frame.attach(this, fill_colors);
 };
 
 MenuWindow::~MenuWindow()
@@ -113,7 +137,10 @@ void MenuWindow::menuAction(actionDescriptor* pAD)
         pAD->pParent->redraw();
         break;
     case actionDescriptor::Menu_select:
+        pAD->pMenu->hideMenu();
         pAD->pParent->rect.set_fill_color(pAD->selected_color);
+        //attach a rectangle to the window
+        pAD->pParent->attach(pAD->pParent->rect);
         pAD->pParent->redraw();
         break;
     default:
