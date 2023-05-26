@@ -35,7 +35,7 @@ class MenuHeader : public Graph_lib::Button
     MenuWindow *pWindow = nullptr;
     std::vector<MenuItem *> buttons;
     bool is_open = false;
-    actionDescriptor mAction = { nullptr, nullptr, actionDescriptor::NoAction, Graph_lib::Color::invisible };
+    actionDescriptor mAction;
 
     static void cb_openclose (Graph_lib::Address, Graph_lib::Address pMenu);
     static void cb_setColor (Graph_lib::Address, Graph_lib::Address pAD);
@@ -60,7 +60,6 @@ class MenuWindow : public Graph_lib::Window
 
     static void cb_close (Graph_lib::Address, Graph_lib::Address pWnd);
     static std::vector<colorSpec> fill_colors;
-    static std::vector<colorSpec> frame_colors;
 public:
     MenuWindow(Graph_lib::Point loc, int width, int height, const string& title);
     ~MenuWindow();
