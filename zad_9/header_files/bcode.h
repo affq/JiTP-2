@@ -45,4 +45,13 @@ int saveBmp(const char* fileName, ImageInfo *imageinfo);
 
 void showLookupTable(ImageInfo *imageinfo);
 
+ImageInfo* rm4scc_gen(size_t width, size_t height, const char* text);
+
+enum BarType{
+	tracker,
+	ascender,
+	descender,
+	full
+};
+
 #endif // __IMAGE_H_INCLUDE__
