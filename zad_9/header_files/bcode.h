@@ -2,6 +2,7 @@
 #define __IMAGE_H_INCLUDE__
 
 #include <stdint.h>
+#include <stddef.h>
 
 #pragma pack(push, 1)
 
@@ -45,13 +46,8 @@ int saveBmp(const char* fileName, ImageInfo *imageinfo);
 
 void showLookupTable(ImageInfo *imageinfo);
 
-ImageInfo* rm4scc_gen(size_t width, size_t height, const char* text);
+//new functions
 
-enum BarType{
-	tracker,
-	ascender,
-	descender,
-	full
-};
+ImageInfo* rm4scc_gen(size_t width, size_t height, const char* text);
 
 #endif // __IMAGE_H_INCLUDE__

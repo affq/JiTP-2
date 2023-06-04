@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "bcode.h"
+#include "header_files/bcode.h"
 
 ImageInfo* inv_pixel1bpp(ImageInfo* pImg, unsigned int x, unsigned int y)
 {
@@ -36,31 +36,21 @@ int main(int argc, char *argv[])
 {
     if (sizeof(bmpHdr) != 54)
     {
-        printf("Size of the bitmap header is invalid (%d). Please, check compiler options.\n", sizeof(bmpHdr));
+        printf("Size of the bitmap header is invalid (%lu). Please, check compiler options.\n", sizeof(bmpHdr));
         return 1;
     }
+    printf ("jestem przed rm4scc_gen\n");
+    ImageInfo *pImg = rm4scc_gen(1024, 368, "JITP2");
+    printf ("jestem po rm4scc_gen\n");
+    saveBmp("jitd2.bmp", pImg);
 
-    ImageInfo *pImg = readBmp("whiteblack32x32.bmp");
+    printf ("Image size: %u x %u\n", pImg->width, pImg->height);
     if (pImg == NULL)
     {
-        printf("Error opening input file whiteblack32x32.bmp\n");
+        printf("Invalid string for RM4SCC encoding\n");
         return 1;
     }
-    showLookupTable(pImg);
-    diagonal1bpp(pImg);
-    saveBmp("wbdiag.bmp", pImg);
+    
     freeImage(pImg);
-
-    pImg = readBmp("yellowblue32x32.bmp");
-    if (pImg == NULL)
-    {
-        printf("Error opening input file yellowblue32x32.bmp\n");
-        return 1;
-    }
-    showLookupTable(pImg);
-    diagonal4bpp(pImg);
-    saveBmp("ybdiag.bmp", pImg);
-    freeImage(pImg);
-
     return 0;
 }
