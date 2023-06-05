@@ -52,6 +52,9 @@ int main(int argc, char *argv[])
     freeImage(pImg);
 
     pImg = readBmp("yellowblue32x32.bmp");
+
+    rm4scc_gen(1024, 768, "witam");
+
     if (pImg == NULL)
     {
         printf("Error opening input file yellowblue32x32.bmp\n");

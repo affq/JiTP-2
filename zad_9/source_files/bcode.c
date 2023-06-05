@@ -339,6 +339,9 @@ void draw_stop_bar(ImageInfo *imageinfo, unsigned int x, unsigned int y)
     make_rectangle(imageinfo, x, y, 1, 5);
 }
 
+//count checksum
+
+
 ImageInfo* rm4scc_gen(size_t width, size_t height, const char* text)
 {
     ImageInfo* imageinfo = createImage(width, height, 1);

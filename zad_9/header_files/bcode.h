@@ -2,6 +2,7 @@
 #define __IMAGE_H_INCLUDE__
 
 #include <stdint.h>
+#include <stddef.h>
 
 #pragma pack(push, 1)
 
