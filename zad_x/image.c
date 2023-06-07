@@ -216,7 +216,7 @@ void bline(ImageInfo* pImg, Point start, Point stop, unsigned char color)
     int dy = stop.y - start.y;
     int d = 2 * dy - dx;
     int y = start.y;
-    for (int x = start.x; x <= stop.x; ++x)
+    for (unsigned int x = start.x; x <= stop.x; ++x)
     {
         set_pixel_4b(pImg, x, y, color);
         if (d > 0)
